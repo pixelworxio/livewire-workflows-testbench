@@ -1,8 +1,21 @@
 <?php
 
-use App\Livewire\ParameterizedRoutes\StepOne;
-use App\Livewire\ParameterizedRoutes\StepThree;
-use App\Livewire\ParameterizedRoutes\StepTwo;
+use App\Livewire\Appointments\ServiceSelection;
+use App\Livewire\Appointments\ProviderSelection;
+use App\Livewire\Appointments\TimeSlotSelection;
+use App\Livewire\Appointments\ConfirmationStep;
+use App\Livewire\Checkout\CartReview;
+use App\Livewire\Checkout\BillingStep;
+use App\Livewire\Checkout\ConfirmationStep as CheckoutConfirmationStep;
+use App\Http\Controllers\Checkout\ShippingController;
+use App\Http\Controllers\Checkout\PaymentController;
+use App\Guards\Appointments\ServiceNotSelectedGuard;
+use App\Guards\Appointments\ProviderNotSelectedGuard;
+use App\Guards\Appointments\TimeSlotNotSelectedGuard;
+use App\Guards\Checkout\CartNotEmptyGuard;
+use App\Guards\Checkout\ShippingNotProvidedGuard;
+use App\Guards\Checkout\BillingNotProvidedGuard;
+use App\Guards\Checkout\PaymentNotProcessedGuard;
 use Pixelworxio\LivewireWorkflows\Facades\Workflow;
 
 /*
@@ -30,65 +43,138 @@ use Pixelworxio\LivewireWorkflows\Facades\Workflow;
 |
 */
 
-Workflow::flow('test-flow')
-    ->entersAt(name: 'test-flow.start', path: '/test-flow')
-    ->finishesAt('index')
-    ->step('step-one')
-        ->goTo(\App\Livewire\StepOneComponent::class)
-        ->unlessPasses(\App\Guards\StepOneGuard::class)
+/*
+|--------------------------------------------------------------------------
+| Registration Workflow
+|--------------------------------------------------------------------------
+|
+| Four-step registration process for new users:
+| 1. User credentials (email, password)
+| 2. Business information (name, type)
+| 3. Demographics (age, location, phone)
+| 4. Subscription selection (basic or premium)
+|
+*/
+// Registration Flow
+Workflow::flow('register')
+    ->entersAt(name: 'register.start', path: '/register')
+    ->finishesAt('login')
+    ->step('user')
+        ->goTo(\App\Livewire\Registration\UserStep::class)
+        ->unlessPasses(\App\Guards\Registration\UserNotCreatedGuard::class)
         ->order(10)
-    ->step('step-two')
-        ->goTo(\App\Livewire\StepTwoComponent::class)
-        ->unlessPasses(\App\Guards\StepTwoGuard::class)
+    ->step('business')
+        ->goTo(\App\Livewire\Registration\BusinessStep::class)
+        ->unlessPasses(\App\Guards\Registration\BusinessNotCreatedGuard::class)
         ->order(20)
-    ->step('step-three')
-        ->goTo(\App\Livewire\StepThreeComponent::class)
-        ->unlessPasses(\App\Guards\StepThreeGuard::class)
-        ->order(30);
+    ->step('demographics')
+        ->goTo(\App\Livewire\Registration\DemographicsStep::class)
+        ->unlessPasses(\App\Guards\Registration\DemographicsNotCompletedGuard::class)
+        ->order(30)
+    ->step('subscription')
+        ->goTo(\App\Livewire\Registration\SubscriptionStep::class)
+        ->unlessPasses(\App\Guards\Registration\SubscriptionNotSelectedGuard::class)
+        ->order(40);
 
-// Parameterized Routes w/ Invokable Controllers as Steps
-Workflow::flow('parameterized-routes')
-    ->entersAt(name: 'parameterized.start', path: '/parameterized/{testModel}/user/{user}')
-    ->finishesAt('index')
-    ->step('first-one')
-        ->goTo(StepOne::class)
-        ->unlessPasses(\App\Guards\StepOneGuard::class)
-        ->order(10)
-    ->step('second-one')
-        ->goTo(StepTwo::class)
-        ->unlessPasses(\App\Guards\StepTwoGuard::class)
-        ->order(20)
-    ->step('third-one')
-        ->goTo(StepThree::class)
-        ->unlessPasses(\App\Guards\StepThreeGuard::class)
-        ->order(30);
-
-// Parameterized Routes w/ Invokable Controllers as Steps
-//Workflow::flow('test2')
-//    ->entersAt(name: 'test2-flow.start', path: '/test2/{testModel}/user/{user}')
-//    ->finishesAt('index')
-//    ->step('first-one')
-//        ->goTo(\App\Http\Controllers\Workflows\StepOneController::class)
-//        ->unlessPasses(\App\Guards\StepOneGuard::class)
-//        ->order(10)
-//    ->step('second-one')
-//        ->goTo(\App\Http\Controllers\Workflows\StepTwoController::class)
-//        ->unlessPasses(\App\Guards\StepTwoGuard::class)
-//        ->order(20);
-
-// Login Flow
+/*
+|--------------------------------------------------------------------------
+| Login with MFA Workflow
+|--------------------------------------------------------------------------
+|
+| Four-step login process with multi-factor authentication:
+| 1. Account login (email, password)
+| 2. MFA verification (if enabled)
+| 3. Subscription check (create if needed)
+| 4. Payment method validation (add if needed)
+|
+*/
+// Login Flow with MFA
 Workflow::flow('login')
-    ->entersAt(name: 'login.test', path: '/auth')
+    ->entersAt(name: 'login.start', path: '/login')
     ->finishesAt('dashboard')
-    ->step('login')
-        ->goTo(\App\Livewire\Auth\TestLoginComponent::class)
-        ->unlessPasses(\App\Guards\Auth\TestLoginGuard::class)
+    ->step('account')
+        ->goTo(\App\Livewire\Login\AccountStep::class)
+        ->unlessPasses(\App\Guards\Login\UserNotAuthenticatedGuard::class)
         ->order(10)
     ->step('mfa')
-        ->goTo(\App\Livewire\Auth\TestMfaComponent::class)
-        ->unlessPasses(\App\Guards\Auth\TestMultiFactorGuard::class)
+        ->goTo(\App\Livewire\Login\MfaStep::class)
+        ->unlessPasses(\App\Guards\Login\MfaNotRequiredOrCompletedGuard::class)
         ->order(20)
-    ->step('subscribe')
-        ->goTo(\App\Livewire\Auth\TestSubscribeComponent::class)
-        ->unlessPasses(\App\Guards\Auth\TestAlreadySubscribedGuard::class)
-        ->order(30);
+    ->step('subscription')
+        ->goTo(\App\Livewire\Login\SubscriptionStep::class)
+        ->unlessPasses(\App\Guards\Login\SubscriptionExistsGuard::class)
+        ->order(30)
+    ->step('payment-method')
+        ->goTo(\App\Livewire\Login\PaymentMethodStep::class)
+        ->unlessPasses(\App\Guards\Login\PaymentMethodExistsGuard::class)
+        ->order(40);
+
+/*
+|--------------------------------------------------------------------------
+| Appointment Booking Workflow
+|--------------------------------------------------------------------------
+|
+| Four-step appointment scheduling process:
+| 1. Service selection
+| 2. Provider selection
+| 3. Time slot selection
+| 4. Confirmation and booking
+|
+*/
+// Appointment Booking Workflow
+Workflow::flow('book-appointment')
+    ->entersAt(name: 'appointment.start', path: '/book-appointment')
+    ->finishesAt('appointment.confirmed')
+    ->step('select-service')
+        ->goTo(ServiceSelection::class)
+        ->unlessPasses(ServiceNotSelectedGuard::class)
+        ->order(10)
+    ->step('select-provider')
+        ->goTo(ProviderSelection::class)
+        ->unlessPasses(ProviderNotSelectedGuard::class)
+        ->order(20)
+    ->step('select-time')
+        ->goTo(TimeSlotSelection::class)
+        ->unlessPasses(TimeSlotNotSelectedGuard::class)
+        ->order(30)
+    ->step('confirm-appointment')
+        ->goTo(ConfirmationStep::class)
+        ->order(40);
+
+/*
+|--------------------------------------------------------------------------
+| Checkout Workflow
+|--------------------------------------------------------------------------
+|
+| Five-step e-commerce checkout process.
+| Demonstrates mixing Livewire components and traditional controllers.
+| 1. Cart review (Livewire)
+| 2. Shipping address (Controller)
+| 3. Billing address (Livewire)
+| 4. Payment method (Controller)
+| 5. Order confirmation (Livewire)
+|
+*/
+// Checkout Workflow - Demonstrates mixing Livewire components and Controllers
+Workflow::flow('checkout')
+    ->entersAt(name: 'checkout.start', path: '/checkout')
+    ->finishesAt('order.confirmed')
+    ->step('cart-review')
+        ->goTo(CartReview::class)
+        ->unlessPasses(CartNotEmptyGuard::class)
+        ->order(10)
+    ->step('shipping')
+        ->goTo(ShippingController::class)
+        ->unlessPasses(ShippingNotProvidedGuard::class)
+        ->order(20)
+    ->step('billing')
+        ->goTo(BillingStep::class)
+        ->unlessPasses(BillingNotProvidedGuard::class)
+        ->order(30)
+    ->step('payment')
+        ->goTo(PaymentController::class)
+        ->unlessPasses(PaymentNotProcessedGuard::class)
+        ->order(40)
+    ->step('confirmation')
+        ->goTo(CheckoutConfirmationStep::class)
+        ->order(50);

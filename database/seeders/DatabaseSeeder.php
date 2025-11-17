@@ -21,5 +21,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        // Seed workflow data
+        $this->call([
+            AppointmentWorkflowSeeder::class,
+            CheckoutWorkflowSeeder::class,
+        ]);
     }
 }

@@ -18,4 +18,12 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+Route::view('appointment-confirmed', 'appointments.confirmed')
+    ->middleware(['auth'])
+    ->name('appointment.confirmed');
+
+Route::view('order-confirmed', 'order.confirmed')
+    ->middleware(['auth'])
+    ->name('order.confirmed');
+
 require __DIR__.'/auth.php';
