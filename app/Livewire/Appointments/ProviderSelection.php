@@ -20,8 +20,6 @@ class ProviderSelection extends Component
     #[WorkflowState]
     public ?int $providerId = null;
 
-    public function mount(){}
-
     /**
      * Select a provider and continue to next step.
      *
@@ -61,8 +59,6 @@ class ProviderSelection extends Component
 
         return view('livewire.appointments.provider-selection', [
             'providers' => $providers,
-            'serviceId' => $this->serviceId,
-            'providerId' => $this->providerId,
         ])->layout('layouts.app');
     }
 }

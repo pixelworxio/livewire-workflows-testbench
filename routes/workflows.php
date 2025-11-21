@@ -123,7 +123,7 @@ Workflow::flow('login')
 */
 // Appointment Booking Workflow
 Workflow::flow('book-appointment')
-    ->entersAt(name: 'appointment.start', path: '/book-appointment')
+    ->entersAt(name: 'book-appointment.start', path: '/book-appointment')
     ->finishesAt('appointment.confirmed')
     ->step('select-service')
         ->goTo(ServiceSelection::class)

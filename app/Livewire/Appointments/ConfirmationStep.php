@@ -97,11 +97,6 @@ class ConfirmationStep extends Component
     {
         return view('livewire.appointments.confirmation-step', [
             'scheduledDateTime' => $this->scheduledAt ? Carbon::parse($this->scheduledAt) : null,
-            'serviceId' => $this->serviceId,
-            'providerId' => $this->providerId,
-            'scheduledAt' => $this->scheduledAt,
-            'service' => $this->service,
-            'provider' => $this->provider,
         ])->layout('layouts.app');
     }
 }
