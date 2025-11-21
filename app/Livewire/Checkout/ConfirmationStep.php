@@ -104,7 +104,7 @@ class ConfirmationStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('checkout');
+        $this->back('checkout', 'confirmation');
     }
 
     /**

@@ -13,10 +13,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($services as $service)
                             <div wire:key="service-{{ $service->id }}"
-                                 class="border border-gray-200 rounded-lg p-6 hover:border-blue-500 hover:shadow-lg transition-all cursor-pointer group"
-                                 wire:click="selectService({{ $service->id }})">
+                                 class="border border-gray-200 rounded-lg p-6 {{ $service->id === $serviceId ? 'border-blue-500 shadow-lg' : 'hover:border-blue-500 hover:shadow-lg' }} transition-all cursor-pointer group"
+                                 wire:click="selectService({{ $service->id }})"
+                            >
                                 <div class="flex items-start justify-between mb-3">
-                                    <h3 class="text-xl font-semibold text-gray-900 group-hover:text-blue-600">
+                                    <h3 class="text-xl font-semibold {{ $service->id === $serviceId ? 'text-blue-600' : 'text-gray-900 group-hover:text-blue-600' }}">
                                         {{ $service->name }}
                                     </h3>
                                     <span class="text-2xl font-bold text-blue-600">

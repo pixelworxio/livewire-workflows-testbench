@@ -74,9 +74,6 @@ class SubscriptionStep extends Component
         try {
             DB::beginTransaction();
 
-            // Store subscription plan in session for guard check
-            session()->put('registration.subscription_plan', $this->subscription_plan);
-
             // Create Business
             $business = Business::create([
                 'name' => session('registration.business_name'),
@@ -104,16 +101,18 @@ class SubscriptionStep extends Component
 
             DB::commit();
 
-            // Clear registration session data
-            session()->forget('registration');
+            // Store subscription plan in session for guard check
+            session()->put('registration.subscription_plan', $this->subscription_plan);
 
             // Continue workflow (redirects to exit point)
             $this->continue('register');
+
         } catch (\Exception $e) {
+
             DB::rollBack();
 
             // Show error message
-            $this->addError('registration', 'Registration failed. Please try again.');
+            $this->addError('registration', 'Registration failed. Please try again. '.$e->getMessage());
         }
     }
 
@@ -122,7 +121,7 @@ class SubscriptionStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('register');
+        $this->back('register', 'subscription');
     }
 
     /**

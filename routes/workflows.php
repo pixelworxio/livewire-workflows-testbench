@@ -45,7 +45,7 @@ use Pixelworxio\LivewireWorkflows\Facades\Workflow;
 
 /*
 |--------------------------------------------------------------------------
-| Registration Workflow
+| Registration Workflow - {url}/register-test
 |--------------------------------------------------------------------------
 |
 | Four-step registration process for new users:
@@ -57,7 +57,7 @@ use Pixelworxio\LivewireWorkflows\Facades\Workflow;
 */
 // Registration Flow
 Workflow::flow('register')
-    ->entersAt(name: 'register.start', path: '/register')
+    ->entersAt(name: 'register.start', path: '/register-test')
     ->finishesAt('login')
     ->step('user')
         ->goTo(\App\Livewire\Registration\UserStep::class)
@@ -78,7 +78,7 @@ Workflow::flow('register')
 
 /*
 |--------------------------------------------------------------------------
-| Login with MFA Workflow
+| Login with MFA Workflow - {url}/login-test
 |--------------------------------------------------------------------------
 |
 | Four-step login process with multi-factor authentication:
@@ -90,7 +90,7 @@ Workflow::flow('register')
 */
 // Login Flow with MFA
 Workflow::flow('login')
-    ->entersAt(name: 'login.start', path: '/login')
+    ->entersAt(name: 'login.start', path: '/login-test')
     ->finishesAt('dashboard')
     ->step('account')
         ->goTo(\App\Livewire\Login\AccountStep::class)
@@ -148,14 +148,14 @@ Workflow::flow('book-appointment')
 |
 | Five-step e-commerce checkout process.
 | Demonstrates mixing Livewire components and traditional controllers.
-| 1. Cart review (Livewire)
+| 1. Cart review (Livewire component)
 | 2. Shipping address (Controller)
-| 3. Billing address (Livewire)
+| 3. Billing address (Livewire component)
 | 4. Payment method (Controller)
-| 5. Order confirmation (Livewire)
+| 5. Order confirmation (Livewire component)
 |
 */
-// Checkout Workflow - Demonstrates mixing Livewire components and Controllers
+// Checkout Workflow - Demonstrates mix of Livewire components and Controllers
 Workflow::flow('checkout')
     ->entersAt(name: 'checkout.start', path: '/checkout')
     ->finishesAt('order.confirmed')

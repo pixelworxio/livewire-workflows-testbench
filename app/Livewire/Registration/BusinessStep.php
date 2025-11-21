@@ -58,7 +58,7 @@ class BusinessStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('register');
+        $this->back('register', 'business');
     }
 
     /**

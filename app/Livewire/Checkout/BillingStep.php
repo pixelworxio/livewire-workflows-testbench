@@ -87,7 +87,7 @@ class BillingStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('checkout');
+        $this->back('checkout', 'billing');
     }
 
     /**

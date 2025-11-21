@@ -371,7 +371,7 @@ class ExampleStepComponent extends Component
      */
     public function goBack(): void
     {
-        $this->back('workflow-name');
+        $this->back('workflow-name', 'current-step-name');
     }
 
     /**

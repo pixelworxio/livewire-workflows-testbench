@@ -20,6 +20,8 @@ class ProviderSelection extends Component
     #[WorkflowState]
     public ?int $providerId = null;
 
+    public function mount(){}
+
     /**
      * Select a provider and continue to next step.
      *
@@ -46,7 +48,7 @@ class ProviderSelection extends Component
         session()->forget('appointment_provider_id');
         $this->providerId = null;
 
-        $this->back('book-appointment');
+        $this->back('book-appointment', 'select-provider');
     }
 
     /**

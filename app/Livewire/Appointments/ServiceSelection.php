@@ -27,7 +27,7 @@ class ServiceSelection extends Component
         // Store service ID in workflow state
         $this->serviceId = $serviceId;
 
-        // Store in session for guard checks
+        // Store in session for example guard checks
         session()->put('appointment_service_id', $serviceId);
 
         // Continue to next step

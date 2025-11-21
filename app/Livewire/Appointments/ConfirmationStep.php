@@ -87,7 +87,7 @@ class ConfirmationStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('book-appointment');
+        $this->back('book-appointment', 'confirm-appointment');
     }
 
     /**

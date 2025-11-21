@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-gray-900">
-                <h2 class="text-3xl font-bold mb-2">Book an Appointment</h2>
+                <h2 class="text-3xl font-bold mb-2">Book an Appointment (Service ID: {{ $serviceId ?? 'missing' }})</h2>
                 <p class="text-gray-600 mb-8">Step 2 of 4: Select a Provider</p>
 
                 @if($providers->isEmpty())

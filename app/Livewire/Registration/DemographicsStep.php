@@ -53,7 +53,7 @@ class DemographicsStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('register');
+        $this->back('register', 'demographics');
     }
 
     /**

@@ -115,7 +115,7 @@ class TimeSlotSelection extends Component
         session()->forget('appointment_scheduled_at');
         $this->scheduledAt = null;
 
-        $this->back('book-appointment');
+        $this->back('book-appointment', 'select-time');
     }
 
     /**
