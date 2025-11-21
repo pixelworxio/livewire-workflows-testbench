@@ -123,6 +123,10 @@ class TimeSlotSelection extends Component
      */
     public function render()
     {
-        return view('livewire.appointments.time-slot-selection')->layout('layouts.app');
+        return view('livewire.appointments.time-slot-selection', [
+            'serviceId' => $this->serviceId,
+            'providerId' => $this->providerId,
+            'scheduledAt' => $this->scheduledAt,
+        ])->layout('layouts.app');
     }
 }

@@ -43,6 +43,7 @@ class ServiceSelection extends Component
 
         return view('livewire.appointments.service-selection', [
             'services' => $services,
+            'serviceId' => $this->serviceId,
         ])->layout('layouts.app');
     }
 }

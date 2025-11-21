@@ -59,6 +59,8 @@ class ProviderSelection extends Component
 
         return view('livewire.appointments.provider-selection', [
             'providers' => $providers,
+            'serviceId' => $this->serviceId,
+            'providerId' => $this->providerId,
         ])->layout('layouts.app');
     }
 }
