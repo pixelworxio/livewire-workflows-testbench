@@ -22,11 +22,15 @@ class DemographicsNotCompletedGuard implements GuardContract
             ->forRequest($request)
             ->get('registration');
 
-            return User::whereEmail($registration['email'])
-                ->whereAge($registration['age'])
-                ->whereLocation($registration['location'])
-                ->wherePhone($registration['phone'])
-                ->exists();
+        if (! isset($registration['age']) || ! isset($registration['location']) || ! isset($registration['phone'])) {
+            return false;
+        }
+
+        return User::whereEmail($registration['email'])
+            ->whereAge($registration['age'])
+            ->whereLocation($registration['location'])
+            ->wherePhone($registration['phone'])
+            ->exists();
     }
 
     /**

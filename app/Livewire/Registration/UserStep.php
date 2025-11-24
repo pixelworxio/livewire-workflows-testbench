@@ -43,6 +43,7 @@ class UserStep extends Component
             [
                 'password' => Hash::make($this->password), // replace pwd – it's a demo, who cares?
                 'name' => $this->email, // Use email as name for now
+                'enabled_mfa' => true, // for testing mfa part of flow
             ]
         );
 

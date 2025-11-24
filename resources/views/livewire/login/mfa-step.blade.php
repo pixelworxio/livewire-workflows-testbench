@@ -1,5 +1,5 @@
 <div id="mfaStepWrapper" class="max-w-md mx-auto">
-    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <div class="px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold mb-2 text-gray-800">Two-Factor Authentication</h2>
         <p class="text-gray-600 mb-6">Enter the 6-digit code to verify your identity.</p>
 
