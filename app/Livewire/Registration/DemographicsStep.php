@@ -2,22 +2,29 @@
 
 namespace App\Livewire\Registration;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\WorkflowStep;
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'register', key: 'demographics')]
 class DemographicsStep extends Component
 {
     use InteractsWithWorkflows;
 
-    #[WorkflowState]
+    #[WorkflowState(namespace: 'registration')]
     public string $age = '';
 
-    #[WorkflowState]
+    #[WorkflowState(namespace: 'registration')]
     public string $location = '';
 
-    #[WorkflowState]
+    #[WorkflowState(namespace: 'registration')]
     public string $phone = '';
+
+    #[WorkflowState(namespace: 'registration')]
+    public string $email = '';
 
     /**
      * Validation rules for this step.
@@ -39,13 +46,14 @@ class DemographicsStep extends Component
         // Validate input
         $this->validate();
 
-        // Store data in session (for guard checks and later use)
-        session()->put('registration.age', $this->age);
-        session()->put('registration.location', $this->location);
-        session()->put('registration.phone', $this->phone);
+        User::whereEmail($this->email)->update([
+            'age' => $this->age,
+            'location' => $this->location,
+            'phone' => $this->phone,
+        ]);
 
         // Continue workflow (moves to next step)
-        $this->continue('register');
+        $this->continue();
     }
 
     /**
@@ -53,7 +61,7 @@ class DemographicsStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('register', 'demographics');
+        $this->back();
     }
 
     /**

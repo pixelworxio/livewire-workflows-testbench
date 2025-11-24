@@ -23,6 +23,8 @@ class Appointment extends Model
         ];
     }
 
+    protected $with = ['user', 'service', 'provider'];
+
     /**
      * Get the user that owns the appointment.
      */

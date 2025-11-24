@@ -21,8 +21,24 @@ class ShippingNotProvidedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if shipping address is already provided (skip this step)
-        return $request->session()->has('checkout_shipping_address');
+        $shippingAddressCollected = workflowState('checkout')
+            ->forRequest($request)
+            ->get('checkout.shipping.shipping_address') ?? [];
+
+        // Fail if we have an empty array
+        if (empty($shippingAddressCollected)) {
+            return false;
+        }
+
+        // Double-check each property for a value
+        foreach ($shippingAddressCollected as $property => $value) {
+            // Fail if we have any empty property value, other than address line 2
+            if ($property !== 'address_line_2' && empty($value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

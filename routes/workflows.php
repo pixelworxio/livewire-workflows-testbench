@@ -1,5 +1,6 @@
 <?php
 
+use App\Guards\Checkout\OrderNotConfirmedGuard;
 use App\Livewire\Appointments\ServiceSelection;
 use App\Livewire\Appointments\ProviderSelection;
 use App\Livewire\Appointments\TimeSlotSelection;
@@ -11,11 +12,14 @@ use App\Http\Controllers\Checkout\ShippingController;
 use App\Http\Controllers\Checkout\PaymentController;
 use App\Guards\Appointments\ServiceNotSelectedGuard;
 use App\Guards\Appointments\ProviderNotSelectedGuard;
+use App\Guards\Appointments\TimeSlotNotConfirmedGuard;
 use App\Guards\Appointments\TimeSlotNotSelectedGuard;
 use App\Guards\Checkout\CartNotEmptyGuard;
 use App\Guards\Checkout\ShippingNotProvidedGuard;
 use App\Guards\Checkout\BillingNotProvidedGuard;
 use App\Guards\Checkout\PaymentNotProcessedGuard;
+use App\Livewire\Checkout\PaymentStep;
+use App\Livewire\Checkout\Shipping;
 use Pixelworxio\LivewireWorkflows\Facades\Workflow;
 
 /*
@@ -58,7 +62,7 @@ use Pixelworxio\LivewireWorkflows\Facades\Workflow;
 // Registration Flow
 Workflow::flow('register')
     ->entersAt(name: 'register.start', path: '/register-test')
-    ->finishesAt('login')
+    ->finishesAt('login.start')
     ->step('user')
         ->goTo(\App\Livewire\Registration\UserStep::class)
         ->unlessPasses(\App\Guards\Registration\UserNotCreatedGuard::class)
@@ -139,6 +143,7 @@ Workflow::flow('book-appointment')
         ->order(30)
     ->step('confirm-appointment')
         ->goTo(ConfirmationStep::class)
+        ->unlessPasses(TimeSlotNotConfirmedGuard::class)
         ->order(40);
 
 /*
@@ -147,15 +152,13 @@ Workflow::flow('book-appointment')
 |--------------------------------------------------------------------------
 |
 | Five-step e-commerce checkout process.
-| Demonstrates mixing Livewire components and traditional controllers.
-| 1. Cart review (Livewire component)
-| 2. Shipping address (Controller)
-| 3. Billing address (Livewire component)
-| 4. Payment method (Controller)
-| 5. Order confirmation (Livewire component)
+| 1. Cart review
+| 2. Shipping address
+| 3. Billing address
+| 4. Payment method
+| 5. Order confirmation
 |
 */
-// Checkout Workflow - Demonstrates mix of Livewire components and Controllers
 Workflow::flow('checkout')
     ->entersAt(name: 'checkout.start', path: '/checkout')
     ->finishesAt('order.confirmed')
@@ -164,7 +167,7 @@ Workflow::flow('checkout')
         ->unlessPasses(CartNotEmptyGuard::class)
         ->order(10)
     ->step('shipping')
-        ->goTo(ShippingController::class)
+        ->goTo(Shipping::class)
         ->unlessPasses(ShippingNotProvidedGuard::class)
         ->order(20)
     ->step('billing')
@@ -172,9 +175,10 @@ Workflow::flow('checkout')
         ->unlessPasses(BillingNotProvidedGuard::class)
         ->order(30)
     ->step('payment')
-        ->goTo(PaymentController::class)
+        ->goTo(PaymentStep::class)
         ->unlessPasses(PaymentNotProcessedGuard::class)
         ->order(40)
     ->step('confirmation')
         ->goTo(CheckoutConfirmationStep::class)
+        ->unlessPasses(OrderNotConfirmedGuard::class)
         ->order(50);

@@ -2,21 +2,28 @@
 
 namespace App\Livewire\Registration;
 
-use App\Models\Business;
-use App\Models\Subscription;
-use App\Models\User;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use App\Models\{Business,Subscription,User};
+use Illuminate\Support\Facades\{DB,Hash};
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'register', key: 'subscription')]
 class SubscriptionStep extends Component
 {
     use InteractsWithWorkflows;
 
-    #[WorkflowState]
+    #[WorkflowState(namespace:'registration')]
+    public string $business_id = '';
+
+    #[WorkflowState(namespace: 'registration')]
+    public ?string $email = '';
+
+    #[WorkflowState(namespace: 'registration')]
     public string $subscription_plan = '';
+
+    #[WorkflowState(namespace: 'registration')]
+    public string $subscription_id = '';
 
     /**
      * Available subscription plans.
@@ -74,26 +81,9 @@ class SubscriptionStep extends Component
         try {
             DB::beginTransaction();
 
-            // Create Business
-            $business = Business::create([
-                'name' => session('registration.business_name'),
-                'business_type' => session('registration.business_type'),
-            ]);
-
-            // Create User
-            $user = User::create([
-                'email' => session('registration.email'),
-                'password' => Hash::make(session('registration.password')),
-                'business_id' => $business->id,
-                'age' => session('registration.age'),
-                'location' => session('registration.location'),
-                'phone' => session('registration.phone'),
-                'name' => session('registration.email'), // Use email as name for now
-            ]);
-
             // Create Subscription
-            Subscription::create([
-                'business_id' => $business->id,
+            $new_subscription = Subscription::create([
+                'business_id' => Business::find($this->business_id)->id,
                 'plan_type' => $this->subscription_plan,
                 'status' => 'active',
                 'expires_at' => now()->addYear(),
@@ -101,11 +91,10 @@ class SubscriptionStep extends Component
 
             DB::commit();
 
-            // Store subscription plan in session for guard check
-            session()->put('registration.subscription_plan', $this->subscription_plan);
+            $this->subscription_id = $new_subscription->id;
 
             // Continue workflow (redirects to exit point)
-            $this->continue('register');
+            $this->continue();
 
         } catch (\Exception $e) {
 
@@ -121,7 +110,7 @@ class SubscriptionStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('register', 'subscription');
+        $this->back();
     }
 
     /**

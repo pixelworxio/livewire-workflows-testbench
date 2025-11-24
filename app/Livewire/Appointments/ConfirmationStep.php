@@ -8,8 +8,10 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Livewire\Component;
 use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\WorkflowStep;
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow: 'book-appointment', key:'confirm-appointment')]
 class ConfirmationStep extends Component
 {
     use InteractsWithWorkflows;
@@ -18,13 +20,16 @@ class ConfirmationStep extends Component
      * Properties with #[WorkflowState] are persisted across steps.
      */
     #[WorkflowState]
-    public ?int $serviceId = null;
+    public ?int $service_id = null;
 
     #[WorkflowState]
-    public ?int $providerId = null;
+    public ?int $provider_id = null;
 
     #[WorkflowState]
-    public ?string $scheduledAt = null;
+    public ?string $scheduled_at = null;
+
+    #[WorkflowState]
+    public bool $confirmed = false;
 
     /**
      * Additional notes for the appointment.
@@ -38,21 +43,6 @@ class ConfirmationStep extends Component
     public ?Provider $provider = null;
 
     /**
-     * Mount component and load related data.
-     */
-    public function mount(): void
-    {
-        // Load service and provider for display
-        if ($this->serviceId) {
-            $this->service = Service::find($this->serviceId);
-        }
-
-        if ($this->providerId) {
-            $this->provider = Provider::find($this->providerId);
-        }
-    }
-
-    /**
      * Create the appointment and complete the workflow.
      */
     public function confirmAppointment(): void
@@ -60,26 +50,21 @@ class ConfirmationStep extends Component
         // Create the appointment record
         $appointment = Appointment::create([
             'user_id' => auth()->id(),
-            'service_id' => $this->serviceId,
-            'provider_id' => $this->providerId,
-            'scheduled_at' => $this->scheduledAt,
+            'service_id' => $this->service_id,
+            'provider_id' => $this->provider_id,
+            'scheduled_at' => $this->scheduled_at,
             'status' => 'scheduled',
             'notes' => $this->notes,
         ]);
 
-        // Clear workflow session data
-        session()->forget([
-            'appointment_service_id',
-            'appointment_provider_id',
-            'appointment_scheduled_at',
-        ]);
+        $this->confirmed = true;
 
         // Store appointment ID for confirmation page
-        session()->flash('appointment_id', $appointment->id);
-        session()->flash('appointment_success', 'Your appointment has been successfully scheduled!');
+        session()->put('appointment_id', $appointment->id);
+        session()->put('appointment_success', 'Your appointment has been successfully scheduled!');
 
         // Complete workflow (redirect to finish route)
-        $this->finish('book-appointment');
+        $this->continue();
     }
 
     /**
@@ -87,7 +72,9 @@ class ConfirmationStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('book-appointment', 'confirm-appointment');
+        $this->confirmed = false;
+
+        $this->back();
     }
 
     /**
@@ -95,8 +82,17 @@ class ConfirmationStep extends Component
      */
     public function render()
     {
+        // Load service and provider for display
+        if ($this->service_id) {
+            $this->service = Service::find($this->service_id);
+        }
+
+        if ($this->provider_id) {
+            $this->provider = Provider::find($this->provider_id);
+        }
+
         return view('livewire.appointments.confirmation-step', [
-            'scheduledDateTime' => $this->scheduledAt ? Carbon::parse($this->scheduledAt) : null,
+            'scheduled_date_time' => $this->scheduled_at ? Carbon::parse($this->scheduled_at) : null,
         ])->layout('layouts.app');
     }
 }

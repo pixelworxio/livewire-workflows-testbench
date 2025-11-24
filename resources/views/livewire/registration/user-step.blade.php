@@ -1,5 +1,5 @@
 <div id="userStepWrapper" class="max-w-xl mx-auto">
-    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <div class="px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold mb-2">Create Your Account</h2>
         <p class="text-gray-600 mb-6">Step 1 of 4: Enter your email and password</p>
 
@@ -45,8 +45,8 @@
         </div>
 
         <!-- Navigation buttons -->
-        <div class="flex justify-end items-center">
-            <x-primary-button wire:click="goToNextStep">
+        <div class="flex justify-center items-center">
+            <x-primary-button wire:click="goToNextStep" class="w-full justify-center">
                 Continue
             </x-primary-button>
         </div>

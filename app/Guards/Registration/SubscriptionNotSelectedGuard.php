@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Guards\Registration;
 
+use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Pixelworxio\LivewireWorkflows\Contracts\GuardContract;
 
@@ -17,9 +18,11 @@ class SubscriptionNotSelectedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if subscription plan is already in session (skip this step)
-        // Return false if subscription plan is not in session (execute this step)
-        return $request->session()->has('registration.subscription_plan');
+        $subscription_id = workflowState('register')
+            ->forRequest($request)
+            ->get('registration.subscription_id');
+
+        return Subscription::whereId($subscription_id)->exists();
     }
 
     /**

@@ -21,8 +21,17 @@ class CartNotEmptyGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if cart review is already done (skip this step)
-        return $request->session()->has('checkout_cart_reviewed');
+        $cart_items = workflowState('checkout')
+            ->forRequest($request)
+            ->get('checkout.cart.cart_items') ?? [];
+
+        $has_items_in_cart = count($cart_items) > 0;
+
+        $cart_confirmed = workflowState('checkout')
+            ->forRequest($request)
+            ->get('checkout.cart.cart_confirmed') ?? false;
+
+        return $has_items_in_cart && $cart_confirmed;
     }
 
     /**

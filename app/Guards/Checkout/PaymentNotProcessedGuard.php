@@ -21,8 +21,15 @@ class PaymentNotProcessedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if payment method is already selected (skip this step)
-        return $request->session()->has('checkout_payment_method');
+        $payment_method_selected = workflowState('checkout')
+            ->forRequest($request)
+            ->get('checkout.payment.selected_payment_method') ?? null;
+
+        $payment_method_confirmed = workflowState('checkout')
+            ->forRequest($request)
+            ->get('checkout.payment.confirmed_payment_method') ?? false;
+
+        return $payment_method_selected && $payment_method_confirmed;
     }
 
     /**

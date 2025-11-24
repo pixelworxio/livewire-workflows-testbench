@@ -184,7 +184,7 @@ GET|HEAD  /order-confirmed             order.confirmed
 ### 1. Seed the Database
 
 ```bash
-php artisan migrate:fresh --seed
+php artisan db:seed --class=CheckoutWorkflowSeeder
 ```
 
 This creates:

@@ -1,5 +1,5 @@
 <div id="accountStepWrapper" class="max-w-md mx-auto">
-    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+    <div class="px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold mb-6 text-gray-800">Login to Your Account</h2>
 
         <form wire:submit.prevent="login">

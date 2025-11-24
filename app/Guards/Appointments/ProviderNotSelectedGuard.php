@@ -21,8 +21,12 @@ class ProviderNotSelectedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if provider is already selected (skip this step)
-        return $request->session()->has('appointment_provider_id');
+        // Skip this step if a provider is already selected
+        $provider_id = workflowState('book-appointment')
+            ->forRequest($request)
+            ->get('provider_id');
+
+        return ! is_null($provider_id);
     }
 
     /**

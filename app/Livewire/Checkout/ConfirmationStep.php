@@ -2,42 +2,18 @@
 
 namespace App\Livewire\Checkout;
 
-use App\Models\Order;
-use App\Models\OrderItem;
+use App\Livewire\Traits\{CheckoutProperties,HasAddress};
+use App\Models\{Order,OrderItem};
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'checkout', key:'confirmation', middleware: ['web', 'auth'])]
 class ConfirmationStep extends Component
 {
+    use CheckoutProperties;
+    use HasAddress;
     use InteractsWithWorkflows;
-
-    /**
-     * Properties with #[WorkflowState] are persisted across steps.
-     */
-    #[WorkflowState]
-    public array $cartItems = [];
-
-    #[WorkflowState]
-    public float $cartTotal = 0.0;
-
-    /**
-     * Order summary data.
-     */
-    public array $shippingAddress = [];
-    public array $billingAddress = [];
-    public string $paymentMethod = '';
-
-    /**
-     * Mount component and load order summary.
-     */
-    public function mount(): void
-    {
-        // Load addresses and payment method from session
-        $this->shippingAddress = session('checkout_shipping_address', []);
-        $this->billingAddress = session('checkout_billing_address', []);
-        $this->paymentMethod = session('checkout_payment_method', '');
-    }
 
     /**
      * Create order and complete workflow.
@@ -45,25 +21,32 @@ class ConfirmationStep extends Component
     public function placeOrder(): void
     {
         // Validate we have all required data
-        if (empty($this->cartItems) || empty($this->shippingAddress) ||
-            empty($this->billingAddress) || empty($this->paymentMethod)) {
+        if (
+            empty($this->cart_items)
+            || !$this->addressIsFilled($this->shipping_address)
+            || !$this->addressIsFilled($this->billing_address)
+            || empty($this->selected_payment_method)
+        ) {
             $this->addError('order', 'Missing required order information. Please go back and complete all steps.');
+
             return;
         }
+
+        $order_number = 'ORD-' . time() . '-' . rand(1000, 9999);
 
         // Create order
         $order = Order::create([
             'user_id' => auth()->id(),
-            'order_number' => 'ORD-' . time() . '-' . rand(1000, 9999),
-            'total' => $this->cartTotal,
+            'order_number' => $order_number,
+            'total' => $this->cart_total,
             'status' => 'pending',
-            'shipping_address' => $this->shippingAddress,
-            'billing_address' => $this->billingAddress,
-            'payment_method' => $this->paymentMethod,
+            'shipping_address' => $this->shipping_address,
+            'billing_address' => $this->billing_address,
+            'payment_method' => $this->selected_payment_method,
         ]);
 
         // Create order items
-        foreach ($this->cartItems as $item) {
+        foreach ($this->cart_items as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_name' => $item['product_name'],
@@ -73,30 +56,26 @@ class ConfirmationStep extends Component
             ]);
         }
 
+        // Handle state
+        $this->order_number = $order_number;
+        $this->order_confirmed = true;
+
         // Clear cart items from database
-        $sessionId = session()->getId();
-        $userId = auth()->id();
+        $session_id = session()->getId();
+        $user_id = auth()->id();
 
         \App\Models\CartItem::query()
-            ->when($userId, fn($q) => $q->where('user_id', $userId))
-            ->when(!$userId, fn($q) => $q->where('session_id', $sessionId))
+            ->when($user_id, fn($q) => $q->where('user_id', $user_id))
+            ->when(!$user_id, fn($q) => $q->where('session_id', $session_id))
             ->delete();
-
-        // Clear checkout session data
-        session()->forget([
-            'checkout_cart_reviewed',
-            'checkout_shipping_address',
-            'checkout_billing_address',
-            'checkout_payment_method',
-        ]);
 
         // Store order ID for confirmation page
         session()->flash('order_id', $order->id);
         session()->flash('order_number', $order->order_number);
         session()->flash('order_success', 'Your order has been successfully placed!');
 
-        // Complete workflow (redirect to finish route)
-        $this->finish('checkout');
+        // Complete workflow (redirects to finish route if all steps are complete)
+        $this->continue();
     }
 
     /**
@@ -104,7 +83,7 @@ class ConfirmationStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('checkout', 'confirmation');
+        $this->back();
     }
 
     /**

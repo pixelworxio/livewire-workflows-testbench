@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Guards\Registration;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Pixelworxio\LivewireWorkflows\Contracts\GuardContract;
 
@@ -17,11 +18,15 @@ class DemographicsNotCompletedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if demographics are already in session (skip this step)
-        // Return false if demographics are not in session (execute this step)
-        return $request->session()->has('registration.age')
-            && $request->session()->has('registration.location')
-            && $request->session()->has('registration.phone');
+        $registration = workflowState('register')
+            ->forRequest($request)
+            ->get('registration');
+
+            return User::whereEmail($registration['email'])
+                ->whereAge($registration['age'])
+                ->whereLocation($registration['location'])
+                ->wherePhone($registration['phone'])
+                ->exists();
     }
 
     /**

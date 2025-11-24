@@ -1,7 +1,9 @@
 <?php
 
+use App\Livewire\Checkout\ViewOrders;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Livewire\Appointments\ViewAppointments;
 
 Route::view('/', 'welcome')->name('index');
 
@@ -22,8 +24,24 @@ Route::view('appointment-confirmed', 'appointments.confirmed')
     ->middleware(['auth'])
     ->name('appointment.confirmed');
 
+Route::get('/book-another-meeting',
+    function (Request $request) {
+        workflowState('book-appointment')->forRequest($request)->clear(); // clear the workflow state for this user
+        return redirect()->route('appointment.start');
+    })
+    ->middleware(['auth'])
+    ->name('appointment.book-again');
+
 Route::view('order-confirmed', 'order.confirmed')
     ->middleware(['auth'])
     ->name('order.confirmed');
+
+Route::get('/appointments', ViewAppointments::class)
+    ->middleware(['auth'])
+    ->name('appointments.index');
+
+Route::get('/orders', ViewOrders::class)
+    ->middleware(['auth'])
+    ->name('orders.index');
 
 require __DIR__.'/auth.php';

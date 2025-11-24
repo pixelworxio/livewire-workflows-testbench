@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Guards\Registration;
 
+use App\Models\Business;
 use Illuminate\Http\Request;
 use Pixelworxio\LivewireWorkflows\Contracts\GuardContract;
 
@@ -17,10 +18,11 @@ class BusinessNotCreatedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if business info is already in session (skip this step)
-        // Return false if business info is not in session (execute this step)
-        return $request->session()->has('registration.business_name')
-            && $request->session()->has('registration.business_type');
+        $registered_business_name = workflowState('register')
+            ->forRequest($request)
+            ->get('registration.business_name');
+
+        return Business::whereName($registered_business_name)->exists();
     }
 
     /**

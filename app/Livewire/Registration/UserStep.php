@@ -2,21 +2,21 @@
 
 namespace App\Livewire\Registration;
 
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'register', key: 'user')]
 class UserStep extends Component
 {
     use InteractsWithWorkflows;
 
-    #[WorkflowState]
+    #[WorkflowState(namespace:'registration')]
     public string $email = '';
 
-    #[WorkflowState]
     public string $password = '';
-
-    #[WorkflowState]
     public string $password_confirmation = '';
 
     /**
@@ -38,12 +38,16 @@ class UserStep extends Component
         // Validate input
         $this->validate();
 
-        // Store data in session (for guard checks and later use)
-        session()->put('registration.email', $this->email);
-        session()->put('registration.password', $this->password);
+        User::updateOrCreate(
+            ['email' => $this->email],
+            [
+                'password' => Hash::make($this->password), // replace pwd – it's a demo, who cares?
+                'name' => $this->email, // Use email as name for now
+            ]
+        );
 
         // Continue workflow (moves to next step)
-        $this->continue('register');
+        $this->continue();
     }
 
     /**

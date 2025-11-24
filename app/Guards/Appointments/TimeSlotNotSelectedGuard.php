@@ -21,8 +21,12 @@ class TimeSlotNotSelectedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if time slot is already selected (skip this step)
-        return $request->session()->has('appointment_scheduled_at');
+        // Skip this step if a provider is already selected
+        $scheduled_at = workflowState('book-appointment')
+            ->forRequest($request)
+            ->get('scheduled_at');
+
+        return ! is_null($scheduled_at);
     }
 
     /**
@@ -30,7 +34,9 @@ class TimeSlotNotSelectedGuard implements GuardContract
      */
     public function onEnter(Request $request): void
     {
-        // Optional: Log entry, analytics, etc.
+        \Log::info('TimeSlotNotSelectedGuard entered', [
+            'state' => workflowState('book-appointment')->forRequest($request)->all(),
+        ]);
     }
 
     /**
@@ -38,7 +44,9 @@ class TimeSlotNotSelectedGuard implements GuardContract
      */
     public function onExit(Request $request): void
     {
-        // Optional: Cleanup, logging, etc.
+        \Log::info('TimeSlotNotSelectedGuard exited', [
+            'state' => workflowState('book-appointment')->forRequest($request)->all(),
+        ]);
     }
 
     /**
@@ -46,7 +54,9 @@ class TimeSlotNotSelectedGuard implements GuardContract
      */
     public function onPass(Request $request): void
     {
-        // Optional: Log skip reason, analytics, etc.
+        \Log::info('TimeSlotNotSelectedGuard passed', [
+            'state' => workflowState('book-appointment')->forRequest($request)->all(),
+        ]);
     }
 
     /**
@@ -54,6 +64,8 @@ class TimeSlotNotSelectedGuard implements GuardContract
      */
     public function onFail(Request $request): void
     {
-        // Optional: Log execution, analytics, etc.
+        \Log::info('TimeSlotNotSelectedGuard failed', [
+            'state' => workflowState('book-appointment')->forRequest($request)->all(),
+        ]);
     }
 }

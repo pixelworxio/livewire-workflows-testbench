@@ -4,17 +4,15 @@ namespace App\Livewire\Login;
 
 use App\Models\PaymentMethod;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\WorkflowStep;
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'login', key: 'mfa', middleware: ['web', 'auth', 'verified'])]
 class PaymentMethodStep extends Component
 {
     use InteractsWithWorkflows;
 
-    #[WorkflowState]
     public string $paymentType = 'credit_card';
-
-    #[WorkflowState]
     public string $lastFour = '';
 
     /**
@@ -46,7 +44,7 @@ class PaymentMethodStep extends Component
         ]);
 
         // Continue to the next step (or finish the workflow)
-        $this->continue('login');
+        $this->continue();
     }
 
     /**

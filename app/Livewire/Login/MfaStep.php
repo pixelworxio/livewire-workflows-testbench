@@ -4,9 +4,10 @@ namespace App\Livewire\Login;
 
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'login', key: 'mfa', middleware: ['web', 'auth'])]
 class MfaStep extends Component
 {
     use InteractsWithWorkflows;
@@ -49,7 +50,7 @@ class MfaStep extends Component
         ]);
 
         // Continue to the next step in the workflow
-        $this->continue('login');
+        $this->continue();
     }
 
     /**

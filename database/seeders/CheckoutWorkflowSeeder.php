@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\CartItem;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CheckoutWorkflowSeeder extends Seeder
 {
@@ -16,7 +17,6 @@ class CheckoutWorkflowSeeder extends Seeder
      */
     public function run(): void
     {
-        // Get the test user
         $user = User::where('email', 'test@example.com')->first();
 
         if (!$user) {
@@ -62,7 +62,7 @@ class CheckoutWorkflowSeeder extends Seeder
         foreach ($products as $product) {
             CartItem::create([
                 'user_id' => $user->id,
-                'session_id' => null, // Authenticated user cart
+                'session_id' => session()->id() ?? Str::uuid(),
                 'product_name' => $product['product_name'],
                 'quantity' => $product['quantity'],
                 'price' => $product['price'],

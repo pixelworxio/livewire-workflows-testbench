@@ -2,43 +2,18 @@
 
 namespace App\Livewire\Checkout;
 
+use App\Livewire\Traits\CheckoutProperties;
+use App\Livewire\Traits\HasAddress;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'checkout', key:'billing', middleware: ['web', 'auth'])]
 class BillingStep extends Component
 {
+    use CheckoutProperties;
+    use HasAddress;
     use InteractsWithWorkflows;
-
-    /**
-     * Properties with #[WorkflowState] are persisted across steps.
-     */
-    #[WorkflowState]
-    public array $billingAddress = [
-        'full_name' => '',
-        'address_line_1' => '',
-        'address_line_2' => '',
-        'city' => '',
-        'state' => '',
-        'zip_code' => '',
-        'country' => 'US',
-    ];
-
-    /**
-     * Same as shipping checkbox.
-     */
-    public bool $sameAsShipping = false;
-
-    /**
-     * Mount component.
-     */
-    public function mount(): void
-    {
-        // Pre-populate billing address if already in session
-        if (session()->has('checkout_billing_address')) {
-            $this->billingAddress = session('checkout_billing_address');
-        }
-    }
 
     /**
      * Validation rules for billing address.
@@ -46,13 +21,13 @@ class BillingStep extends Component
     protected function rules(): array
     {
         return [
-            'billingAddress.full_name' => 'required|string|max:255',
-            'billingAddress.address_line_1' => 'required|string|max:255',
-            'billingAddress.address_line_2' => 'nullable|string|max:255',
-            'billingAddress.city' => 'required|string|max:100',
-            'billingAddress.state' => 'required|string|max:50',
-            'billingAddress.zip_code' => 'required|string|max:20',
-            'billingAddress.country' => 'required|string|max:2',
+            'billing_address.full_name' => 'required|string|max:255',
+            'billing_address.address_line_1' => 'required|string|max:255',
+            'billing_address.address_line_2' => 'nullable|string|max:255',
+            'billing_address.city' => 'required|string|max:100',
+            'billing_address.state' => 'required|string|max:50',
+            'billing_address.zip_code' => 'required|string|max:20',
+            'billing_address.country' => 'required|string|max:2',
         ];
     }
 
@@ -61,9 +36,8 @@ class BillingStep extends Component
      */
     public function updatedSameAsShipping($value): void
     {
-        if ($value && session()->has('checkout_shipping_address')) {
-            $shippingAddress = session('checkout_shipping_address');
-            $this->billingAddress = $shippingAddress;
+        if ($value && !empty($this->shipping_address)) {
+            $this->billing_address = $this->shipping_address;
         }
     }
 
@@ -75,11 +49,8 @@ class BillingStep extends Component
         // Validate input
         $this->validate();
 
-        // Store billing address in session
-        session()->put('checkout_billing_address', $this->billingAddress);
-
         // Continue to next step
-        $this->continue('checkout');
+        $this->continue();
     }
 
     /**
@@ -87,7 +58,9 @@ class BillingStep extends Component
      */
     public function goBack(): void
     {
-        $this->back('checkout', 'billing');
+        $this->reset('billing_address','same_as_shipping');
+
+        $this->back();
     }
 
     /**
@@ -95,8 +68,6 @@ class BillingStep extends Component
      */
     public function render()
     {
-        return view('livewire.checkout.billing-step', [
-            'shippingAddress' => session('checkout_shipping_address'),
-        ])->layout('layouts.app');
+        return view('livewire.checkout.billing-step')->layout('layouts.app');
     }
 }

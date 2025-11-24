@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Guards\Registration;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Pixelworxio\LivewireWorkflows\Contracts\GuardContract;
 
@@ -17,10 +18,11 @@ class UserNotCreatedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if user email is already in session (skip this step)
-        // Return false if user email is not in session (execute this step)
-        return $request->session()->has('registration.email')
-            && $request->session()->has('registration.password');
+        $registration_email = workflowState('register')
+            ->forRequest($request)
+            ->get('registration.email');
+
+        return User::whereEmail($registration_email)->exists();
     }
 
     /**

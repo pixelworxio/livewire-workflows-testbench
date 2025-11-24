@@ -5,9 +5,10 @@ namespace App\Livewire\Login;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'login', key: 'account')]
 class AccountStep extends Component
 {
     use InteractsWithWorkflows;
@@ -15,7 +16,6 @@ class AccountStep extends Component
     #[WorkflowState]
     public string $email = '';
 
-    #[WorkflowState]
     public string $password = '';
 
     public bool $remember = false;
@@ -62,7 +62,7 @@ class AccountStep extends Component
         }
 
         // Continue to the next step in the workflow
-        $this->continue('login');
+        $this->continue();
     }
 
     /**

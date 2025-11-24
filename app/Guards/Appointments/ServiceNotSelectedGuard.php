@@ -21,8 +21,12 @@ class ServiceNotSelectedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        // Return true if service is already selected (skip this step)
-        return $request->session()->has('appointment_service_id');
+        // Skip this step if a service is already selected
+        $serviceId = workflowState('book-appointment')
+            ->forRequest($request)
+            ->get('service_id');
+
+        return ! is_null($serviceId);
     }
 
     /**

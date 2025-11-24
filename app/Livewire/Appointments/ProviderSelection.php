@@ -4,9 +4,10 @@ namespace App\Livewire\Appointments;
 
 use App\Models\Provider;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState, WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow: 'book-appointment', key:'select-provider')]
 class ProviderSelection extends Component
 {
     use InteractsWithWorkflows;
@@ -15,28 +16,23 @@ class ProviderSelection extends Component
      * Properties with #[WorkflowState] are persisted across steps.
      */
     #[WorkflowState]
-    public ?int $serviceId = null;
-
-    #[WorkflowState]
-    public ?int $providerId = null;
-
-    public function mount(){}
+    public ?int $provider_id = null;
 
     /**
      * Select a provider and continue to next step.
      *
      * @param int $providerId
      */
-    public function selectProvider(int $providerId): void
+    public function selectProvider(int $provider_id): void
     {
         // Store provider ID in workflow state
-        $this->providerId = $providerId;
+        $this->provider_id = $provider_id;
 
         // Store in session for guard checks
-        session()->put('appointment_provider_id', $providerId);
+        session()->put('appointment_provider_id', $provider_id);
 
         // Continue to next step
-        $this->continue('book-appointment');
+        $this->continue();
     }
 
     /**
@@ -44,11 +40,9 @@ class ProviderSelection extends Component
      */
     public function goBack(): void
     {
-        // Clear current step data
-        session()->forget('appointment_provider_id');
-        $this->providerId = null;
+        $this->provider_id = null; // optional
 
-        $this->back('book-appointment', 'select-provider');
+        $this->back();
     }
 
     /**

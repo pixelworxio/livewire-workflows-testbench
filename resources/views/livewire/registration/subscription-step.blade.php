@@ -1,5 +1,5 @@
-<div id="subscriptionStepWrapper" class="max-w-4xl mx-auto">
-    <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+<div id="subscriptionStepWrapper" class="w-full max-w-7xl mx-auto">
+    <div class="px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold mb-2">Choose Your Plan</h2>
         <p class="text-gray-600 mb-6">Step 4 of 4: Select a subscription plan</p>
 

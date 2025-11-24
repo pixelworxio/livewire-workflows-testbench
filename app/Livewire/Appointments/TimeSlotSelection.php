@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Appointments;
 
+use App\Models\Appointment;
 use Carbon\Carbon;
 use Livewire\Component;
 use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\WorkflowStep;
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow: 'book-appointment', key:'select-time')]
 class TimeSlotSelection extends Component
 {
     use InteractsWithWorkflows;
@@ -15,20 +18,16 @@ class TimeSlotSelection extends Component
      * Properties with #[WorkflowState] are persisted across steps.
      */
     #[WorkflowState]
-    public ?int $serviceId = null;
+    public ?string $scheduled_at = null;
 
     #[WorkflowState]
-    public ?int $providerId = null;
-
-    #[WorkflowState]
-    public ?string $scheduledAt = null;
+    public ?string $selected_time = null;
 
     /**
      * Regular properties (without attribute) are NOT persisted.
      */
-    public string $selectedDate = '';
-    public ?string $selectedTime = null;
-    public array $availableTimeSlots = [];
+    public string $selected_date = '';
+    public array $available_time_slots = [];
 
     /**
      * Validation rules for this step.
@@ -36,8 +35,8 @@ class TimeSlotSelection extends Component
     protected function rules(): array
     {
         return [
-            'selectedDate' => 'required|date|after_or_equal:today',
-            'selectedTime' => 'required',
+            'selected_date' => 'required|date|after_or_equal:today',
+            'selected_time' => 'required',
         ];
     }
 
@@ -47,7 +46,7 @@ class TimeSlotSelection extends Component
     public function mount(): void
     {
         // Set default date to tomorrow
-        $this->selectedDate = Carbon::tomorrow()->format('Y-m-d');
+        $this->selected_date = Carbon::tomorrow()->format('Y-m-d');
         $this->generateTimeSlots();
     }
 
@@ -56,7 +55,7 @@ class TimeSlotSelection extends Component
      */
     public function updatedSelectedDate(): void
     {
-        $this->selectedTime = null;
+        $this->selected_time = null;
         $this->generateTimeSlots();
     }
 
@@ -65,26 +64,31 @@ class TimeSlotSelection extends Component
      */
     protected function generateTimeSlots(): void
     {
-        $this->availableTimeSlots = [];
+        $this->available_time_slots = [];
 
-        if (!$this->selectedDate) {
+        if (!$this->selected_date) {
             return;
         }
 
         // Generate time slots from 9 AM to 5 PM (every 30 minutes)
-        $date = Carbon::parse($this->selectedDate);
-        $startTime = $date->copy()->setTime(9, 0);
-        $endTime = $date->copy()->setTime(17, 0);
+        $date = Carbon::parse($this->selected_date);
+        $start_time = $date->copy()->setTime(9, 0);
+        $end_time = $date->copy()->setTime(17, 0);
 
-        while ($startTime < $endTime) {
+        while ($start_time < $end_time) {
             // Only show future time slots if date is today
-            if ($date->isToday() && $startTime <= Carbon::now()) {
-                $startTime->addMinutes(30);
+            if ($date->isToday() && $start_time <= Carbon::now()) {
+                $start_time->addMinutes(30);
                 continue;
             }
 
-            $this->availableTimeSlots[] = $startTime->format('H:i');
-            $startTime->addMinutes(30);
+            $existing_appointment = Appointment::where('scheduled_at', $start_time)->exists();
+
+            if (! $existing_appointment) {
+                $this->available_time_slots[] = $start_time->format('H:i');
+            }
+
+            $start_time->addMinutes(30);
         }
     }
 
@@ -97,13 +101,10 @@ class TimeSlotSelection extends Component
         $this->validate();
 
         // Combine date and time
-        $this->scheduledAt = Carbon::parse($this->selectedDate . ' ' . $this->selectedTime)->toDateTimeString();
-
-        // Store in session for guard checks
-        session()->put('appointment_scheduled_at', $this->scheduledAt);
+        $this->scheduled_at = Carbon::parse($this->selected_date . ' ' . $this->selected_time)->toDateTimeString();
 
         // Continue to next step
-        $this->continue('book-appointment');
+        $this->continue();
     }
 
     /**
@@ -112,10 +113,10 @@ class TimeSlotSelection extends Component
     public function goBack(): void
     {
         // Clear current step data
-        session()->forget('appointment_scheduled_at');
-        $this->scheduledAt = null;
+        $this->selected_time = null;
+        $this->scheduled_at = null;
 
-        $this->back('book-appointment', 'select-time');
+        $this->back();
     }
 
     /**

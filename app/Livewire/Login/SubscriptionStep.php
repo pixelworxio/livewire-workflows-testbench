@@ -4,8 +4,10 @@ namespace App\Livewire\Login;
 
 use App\Models\Subscription;
 use Livewire\Component;
+use Pixelworxio\LivewireWorkflows\Attributes\WorkflowStep;
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'login', key: 'mfa', middleware: ['web', 'auth', 'verified'])]
 class SubscriptionStep extends Component
 {
     use InteractsWithWorkflows;
@@ -32,7 +34,7 @@ class SubscriptionStep extends Component
         ]);
 
         // Continue to the next step in the workflow
-        $this->continue('login');
+        $this->continue();
     }
 
     /**

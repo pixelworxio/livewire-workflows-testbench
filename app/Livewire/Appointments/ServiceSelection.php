@@ -4,9 +4,10 @@ namespace App\Livewire\Appointments;
 
 use App\Models\Service;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState, WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow: 'book-appointment', key:'select-service')]
 class ServiceSelection extends Component
 {
     use InteractsWithWorkflows;
@@ -15,23 +16,20 @@ class ServiceSelection extends Component
      * Properties with #[WorkflowState] are persisted across steps.
      */
     #[WorkflowState]
-    public ?int $serviceId = null;
+    public ?int $service_id = null;
 
     /**
      * Select a service and continue to next step.
      *
      * @param int $serviceId
      */
-    public function selectService(int $serviceId): void
+    public function selectService(int $service_id): void
     {
         // Store service ID in workflow state
-        $this->serviceId = $serviceId;
-
-        // Store in session for example guard checks
-        session()->put('appointment_service_id', $serviceId);
+        $this->service_id = $service_id;
 
         // Continue to next step
-        $this->continue('book-appointment');
+        $this->continue();
     }
 
     /**

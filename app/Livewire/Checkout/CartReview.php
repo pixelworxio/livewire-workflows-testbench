@@ -2,31 +2,18 @@
 
 namespace App\Livewire\Checkout;
 
+use App\Livewire\Traits\CheckoutProperties;
 use App\Models\CartItem;
+use Illuminate\Support\Str;
 use Livewire\Component;
-use Pixelworxio\LivewireWorkflows\Attributes\WorkflowState;
+use Pixelworxio\LivewireWorkflows\Attributes\{WorkflowState,WorkflowStep};
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
+#[WorkflowStep(flow:'checkout', key:'cart-review', middleware: ['web', 'auth'])]
 class CartReview extends Component
 {
+    use CheckoutProperties;
     use InteractsWithWorkflows;
-
-    /**
-     * Properties with #[WorkflowState] are persisted across steps.
-     */
-    #[WorkflowState]
-    public array $cartItems = [];
-
-    #[WorkflowState]
-    public float $cartTotal = 0.0;
-
-    /**
-     * Mount component and load cart items.
-     */
-    public function mount(): void
-    {
-        $this->loadCartItems();
-    }
 
     /**
      * Load cart items from database.
@@ -41,7 +28,7 @@ class CartReview extends Component
             ->when(!$userId, fn($q) => $q->where('session_id', $sessionId))
             ->get();
 
-        $this->cartItems = $items->map(function ($item) {
+        $this->cart_items = $items->map(function ($item) {
             return [
                 'id' => $item->id,
                 'product_name' => $item->product_name,
@@ -59,11 +46,6 @@ class CartReview extends Component
      */
     public function updateQuantity(int $itemId, int $quantity): void
     {
-        if ($quantity < 1) {
-            $this->removeItem($itemId);
-            return;
-        }
-
         $item = CartItem::find($itemId);
         if ($item) {
             $item->update(['quantity' => $quantity]);
@@ -85,7 +67,7 @@ class CartReview extends Component
      */
     private function calculateTotal(): void
     {
-        $this->cartTotal = collect($this->cartItems)->sum('subtotal');
+        $this->cart_total = collect($this->cart_items)->sum('subtotal');
     }
 
     /**
@@ -94,16 +76,60 @@ class CartReview extends Component
     public function proceedToShipping(): void
     {
         // Validate cart is not empty
-        if (empty($this->cartItems)) {
+        if (empty($this->cart_items)) {
             $this->addError('cart', 'Your cart is empty. Please add items before proceeding.');
             return;
         }
 
-        // Mark cart as reviewed
-        session()->put('checkout_cart_reviewed', true);
+        $this->cart_confirmed = true;
 
         // Continue to next step
-        $this->continue('checkout');
+        $this->continue();
+    }
+
+    public function addDemoProducts(): void
+    {
+        $user = auth()->user();
+        CartItem::where('user_id', $user->id)->delete();
+
+        // Create sample cart items
+        $products = [
+            [
+                'product_name' => 'Premium Wireless Headphones',
+                'quantity' => 1,
+                'price' => 149.99,
+            ],
+            [
+                'product_name' => 'Smart Watch Series X',
+                'quantity' => 2,
+                'price' => 299.99,
+            ],
+            [
+                'product_name' => 'USB-C Charging Cable (3-Pack)',
+                'quantity' => 1,
+                'price' => 19.99,
+            ],
+            [
+                'product_name' => 'Portable Power Bank 20000mAh',
+                'quantity' => 1,
+                'price' => 45.99,
+            ],
+            [
+                'product_name' => 'Bluetooth Speaker - Waterproof',
+                'quantity' => 3,
+                'price' => 79.99,
+            ],
+        ];
+
+        foreach ($products as $product) {
+            CartItem::create([
+                'user_id' => $user->id,
+                'session_id' => session()->id() ?? Str::uuid(),
+                'product_name' => $product['product_name'],
+                'quantity' => $product['quantity'],
+                'price' => $product['price'],
+            ]);
+        }
     }
 
     /**
@@ -111,6 +137,8 @@ class CartReview extends Component
      */
     public function render()
     {
+        $this->loadCartItems();
+
         return view('livewire.checkout.cart-review')
             ->layout('layouts.app');
     }
