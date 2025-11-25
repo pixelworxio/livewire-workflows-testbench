@@ -29,7 +29,7 @@ new class extends Component
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden sm:flex space-x-8 sm:-my-px sm:ms-10">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
@@ -44,7 +44,7 @@ new class extends Component
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <div class="hidden space-x-8 sm:-my-px sm:flex mr-6">
+                <div class="h-full hidden sm:flex space-x-8 sm:-my-px mr-6">
                     <x-nav-link :href="route('appointment.start')" :active="request()->routeIs('appointment.start')" wire:navigate>
                         {{ __('Book Appointment Example') }}
                     </x-nav-link>

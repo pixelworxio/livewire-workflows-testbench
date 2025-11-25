@@ -8,7 +8,7 @@
                     <div class="w-full flex justify-between items-start gap-6">
                         <div>
                             <h2 class="text-3xl font-bold mb-2">Orders Submitted</h2>
-                            <p class="mb-2 text-zinc-600 dark:text-zinc-400">pending description</p>
+                            <p class="mb-2 text-zinc-600 dark:text-zinc-400">List of orders placed through <a href="{{ route('checkout.start') }}" class="underline underline-offset-4 font-medium text-blue-400">Checkout Example</a>.</p>
                         </div>
                     </div>
                 </div>
