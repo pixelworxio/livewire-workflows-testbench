@@ -20,7 +20,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-If not using SQLite, update .env w/ mysql credentials.
+If not using SQLite, update .env w/ your database credentials.
 
 ```bash
 php artisan migrate
@@ -99,6 +99,6 @@ Manual: Navigate `/checkout`, review cart → enter shipping → enter billing �
 
 ## References
 
-- [Package](https://github.com/pixelworxio/livewire-workflows)
+- [Livewire Workflows Package](https://github.com/pixelworxio/livewire-workflows)
 - [Livewire Docs](https://livewire.laravel.com)
 - [Laravel Docs](https://laravel.com/docs)
