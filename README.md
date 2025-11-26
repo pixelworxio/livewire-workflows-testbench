@@ -18,6 +18,11 @@ composer install
 npm install
 cp .env.example .env
 php artisan key:generate
+```
+
+If not using SQLite, update .env w/ mysql credentials.
+
+```bash
 php artisan migrate
 php artisan db:seed --class=AppointmentWorkflowSeeder
 npm run dev
