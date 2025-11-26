@@ -53,7 +53,7 @@ class DemographicsStep extends Component
         ]);
 
         // Continue workflow (moves to next step)
-        $this->continue();
+        $this->continue('register');
     }
 
     /**
@@ -61,7 +61,7 @@ class DemographicsStep extends Component
      */
     public function goBack(): void
     {
-        $this->back();
+        $this->back('register', 'demographics');
     }
 
     /**

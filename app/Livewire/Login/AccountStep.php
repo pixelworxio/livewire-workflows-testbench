@@ -62,7 +62,7 @@ class AccountStep extends Component
         }
 
         // Continue to the next step in the workflow
-        $this->continue();
+        $this->continue('login');
     }
 
     /**

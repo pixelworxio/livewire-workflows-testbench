@@ -75,7 +75,7 @@ class ConfirmationStep extends Component
         session()->flash('order_success', 'Your order has been successfully placed!');
 
         // Complete workflow (redirects to finish route if all steps are complete)
-        $this->continue();
+        $this->continue('checkout');
     }
 
     /**
@@ -83,7 +83,7 @@ class ConfirmationStep extends Component
      */
     public function goBack(): void
     {
-        $this->back();
+        $this->back('checkout', 'confirmation');
     }
 
     /**

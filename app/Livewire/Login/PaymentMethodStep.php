@@ -44,7 +44,7 @@ class PaymentMethodStep extends Component
         ]);
 
         // Continue to the next step (or finish the workflow)
-        $this->continue();
+        $this->continue('login');
     }
 
     /**

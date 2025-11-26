@@ -64,7 +64,7 @@ class ConfirmationStep extends Component
         session()->put('appointment_success', 'Your appointment has been successfully scheduled!');
 
         // Complete workflow (redirect to finish route)
-        $this->continue();
+        $this->continue('book-appointment');
     }
 
     /**
@@ -74,7 +74,7 @@ class ConfirmationStep extends Component
     {
         $this->confirmed = false;
 
-        $this->back();
+        $this->back('book-appointment', 'confirm-appointment');
     }
 
     /**

@@ -75,7 +75,7 @@ class BusinessStep extends Component
             $this->business_id = $business->id;
 
             // Continue workflow (redirects to exit point)
-            $this->continue();
+            $this->continue('register');
 
         } catch (\Exception $e) {
 

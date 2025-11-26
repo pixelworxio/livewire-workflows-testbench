@@ -29,7 +29,7 @@ class ServiceSelection extends Component
         $this->service_id = $service_id;
 
         // Continue to next step
-        $this->continue();
+        $this->continue('book-appointment');
     }
 
     /**

@@ -32,14 +32,14 @@ class PaymentStep extends Component
 
         $this->confirmed_payment_method = true;
 
-        $this->continue();
+        $this->continue('checkout');
     }
 
     public function goBack(): void
     {
         $this->confirmed_payment_method = false; // for demo purposes
 
-        $this->back();
+        $this->back('checkout', 'payment');
     }
 
     public function render()

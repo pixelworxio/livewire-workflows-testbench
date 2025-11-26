@@ -94,7 +94,7 @@ class SubscriptionStep extends Component
             $this->subscription_id = $new_subscription->id;
 
             // Continue workflow (redirects to exit point)
-            $this->continue();
+            $this->continue('register');
 
         } catch (\Exception $e) {
 
@@ -110,7 +110,7 @@ class SubscriptionStep extends Component
      */
     public function goBack(): void
     {
-        $this->back();
+        $this->back('register', 'subscription');
     }
 
     /**

@@ -48,7 +48,7 @@ class UserStep extends Component
         );
 
         // Continue workflow (moves to next step)
-        $this->continue();
+        $this->continue('register');
     }
 
     /**

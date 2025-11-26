@@ -45,7 +45,7 @@ class Shipping extends Component
             'shipping_address.country' => 'required|string|max:2',
         ]);
 
-        $this->continue();
+        $this->continue('checkout');
     }
 
     public function goBack(): void
@@ -54,7 +54,7 @@ class Shipping extends Component
             ->forRequest(request())
             ->set('checkout.cart.cartConfirmed', false);
 
-        $this->back();
+        $this->back('checkout', 'shipping');
     }
 
     public function fillShippingAddress(): void

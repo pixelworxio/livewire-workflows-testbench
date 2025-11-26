@@ -84,7 +84,7 @@ class CartReview extends Component
         $this->cart_confirmed = true;
 
         // Continue to next step
-        $this->continue();
+        $this->continue('checkout');
     }
 
     public function addDemoProducts(): void

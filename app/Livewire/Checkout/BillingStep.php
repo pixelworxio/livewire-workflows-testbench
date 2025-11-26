@@ -50,7 +50,7 @@ class BillingStep extends Component
         $this->validate();
 
         // Continue to next step
-        $this->continue();
+        $this->continue('checkout');
     }
 
     /**
@@ -60,7 +60,7 @@ class BillingStep extends Component
     {
         $this->reset('billing_address','same_as_shipping');
 
-        $this->back();
+        $this->back('checkout', 'billing');
     }
 
     /**

@@ -104,7 +104,7 @@ class TimeSlotSelection extends Component
         $this->scheduled_at = Carbon::parse($this->selected_date . ' ' . $this->selected_time)->toDateTimeString();
 
         // Continue to next step
-        $this->continue();
+        $this->continue('book-appointment');
     }
 
     /**
@@ -116,7 +116,7 @@ class TimeSlotSelection extends Component
         $this->selected_time = null;
         $this->scheduled_at = null;
 
-        $this->back();
+        $this->back('book-appointment', 'select-time');
     }
 
     /**

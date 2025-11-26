@@ -32,7 +32,7 @@ class ProviderSelection extends Component
         session()->put('appointment_provider_id', $provider_id);
 
         // Continue to next step
-        $this->continue();
+        $this->continue('book-appointment');
     }
 
     /**
@@ -42,7 +42,7 @@ class ProviderSelection extends Component
     {
         $this->provider_id = null; // optional
 
-        $this->back();
+        $this->back('book-appointment', 'select-provider');
     }
 
     /**
