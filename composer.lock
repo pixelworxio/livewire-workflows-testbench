@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "78777320ebb94a9634f229e6ba681ebf",
+    "content-hash": "40f7568ffba9275a5fabd9a061ad698a",
     "packages": [
         {
             "name": "brick/math",
@@ -2748,11 +2748,17 @@
         },
         {
             "name": "pixelworxio/livewire-workflows",
-            "version": "dev-claude/add-workflow-name-attribute-01RStcQoDkUbYq2jic9FkX2G",
+            "version": "0.5.1b",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pixelworxio/livewire-workflows.git",
+                "reference": "28522c9411bfbd3d35b6bec5f0bff2d6f871f525"
+            },
             "dist": {
-                "type": "path",
-                "url": "../livewire-workflows",
-                "reference": "05db2bc8534048bc99ec57d141a7ff26dea00807"
+                "type": "zip",
+                "url": "https://api.github.com/repos/pixelworxio/livewire-workflows/zipball/28522c9411bfbd3d35b6bec5f0bff2d6f871f525",
+                "reference": "28522c9411bfbd3d35b6bec5f0bff2d6f871f525",
+                "shasum": ""
             },
             "require": {
                 "illuminate/contracts": "^11.0||^12.0",
@@ -2778,33 +2784,23 @@
             "type": "library",
             "extra": {
                 "laravel": {
-                    "providers": [
-                        "Pixelworxio\\LivewireWorkflows\\LivewireWorkflowsServiceProvider"
-                    ],
                     "aliases": {
                         "Workflow": "Pixelworxio\\LivewireWorkflows\\Facades\\Workflow"
-                    }
+                    },
+                    "providers": [
+                        "Pixelworxio\\LivewireWorkflows\\LivewireWorkflowsServiceProvider"
+                    ]
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Pixelworxio\\LivewireWorkflows\\": "src/"
-                },
                 "files": [
                     "src/helpers.php"
-                ]
-            },
-            "autoload-dev": {
+                ],
                 "psr-4": {
-                    "Pixelworxio\\LivewireWorkflows\\Tests\\": "tests/",
-                    "Tests\\": "tests/"
+                    "Pixelworxio\\LivewireWorkflows\\": "src/"
                 }
             },
-            "scripts": {
-                "test": [
-                    "vendor/bin/pest"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -2818,16 +2814,23 @@
             "description": "Build multi-step workflows in Laravel / Livewire with zero boilerplate",
             "homepage": "https://github.com/pixelworxio/livewire-workflows",
             "keywords": [
-                "forms",
+                "Forms",
                 "laravel",
                 "livewire",
                 "multistep",
                 "workflow"
             ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/pixelworxio/livewire-workflows/issues",
+                "source": "https://github.com/pixelworxio/livewire-workflows/tree/0.5.1b"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Pixelworxio",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-11-21T19:22:53+00:00"
         },
         {
             "name": "psr/clock",
@@ -8707,10 +8710,8 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {
-        "pixelworxio/livewire-workflows": 20
-    },
+    "minimum-stability": "dev",
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -5,20 +5,13 @@
     "description": "The skeleton application for the Laravel framework.",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../livewire-workflows",
-            "options": { "symlink": true }
-        }
-    ],
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6.4",
         "livewire/volt": "^1.7.0",
-        "pixelworxio/livewire-workflows": "@dev"
+        "pixelworxio/livewire-workflows": "^0.5.1@beta"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -92,6 +85,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true
 }
