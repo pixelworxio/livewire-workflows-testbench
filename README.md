@@ -15,10 +15,12 @@ Complete workflow examples for the [pixelworxio/livewire-workflows](https://gith
 git clone https://github.com/pixelworxio/livewire-workflows-testbench.git
 cd livewire-workflows-testbench
 composer install
+npm install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate
 php artisan db:seed --class=AppointmentWorkflowSeeder
+npm run dev
 php artisan serve
 ```
 
