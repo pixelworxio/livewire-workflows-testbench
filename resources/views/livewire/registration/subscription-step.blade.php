@@ -1,5 +1,5 @@
 <div id="subscriptionStepWrapper" class="w-full max-w-7xl mx-auto">
-    <div class="px-8 pt-6 pb-8 mb-4">
+    <form wire:submit="completeRegistration" class="px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold mb-2">Choose Your Plan</h2>
         <p class="text-gray-600 mb-6">Step 4 of 4: Select a subscription plan</p>
 
@@ -75,13 +75,13 @@
 
         <!-- Navigation buttons -->
         <div class="flex justify-between items-center">
-            <x-secondary-button wire:click="goBack">
+            <x-secondary-button type="button" wire:click="goBack">
                 Back
             </x-secondary-button>
 
-            <x-primary-button wire:click="completeRegistration" :disabled="!$subscription_plan">
+            <x-primary-button :disabled="!$subscription_plan">
                 Complete Registration
             </x-primary-button>
         </div>
-    </div>
+    </form>
 </div>

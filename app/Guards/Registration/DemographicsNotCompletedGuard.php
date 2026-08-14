@@ -18,18 +18,20 @@ class DemographicsNotCompletedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        $registration = workflowState('register')
-            ->forRequest($request)
-            ->get('registration');
+        $state = workflowState('register')->forRequest($request);
+        $age = $state->get('registration.age');
+        $location = $state->get('registration.location');
+        $phone = $state->get('registration.phone');
+        $email = $state->get('registration.email');
 
-        if (! isset($registration['age']) || ! isset($registration['location']) || ! isset($registration['phone'])) {
+        if ($age === null || $location === null || $phone === null || $email === null) {
             return false;
         }
 
-        return User::whereEmail($registration['email'])
-            ->whereAge($registration['age'])
-            ->whereLocation($registration['location'])
-            ->wherePhone($registration['phone'])
+        return User::whereEmail($email)
+            ->whereAge($age)
+            ->whereLocation($location)
+            ->wherePhone($phone)
             ->exists();
     }
 
