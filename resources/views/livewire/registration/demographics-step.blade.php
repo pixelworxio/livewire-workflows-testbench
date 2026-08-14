@@ -1,5 +1,5 @@
 <div id="demographicsStepWrapper" class="max-w-xl mx-auto">
-    <div class="px-8 pt-6 pb-8 mb-4">
+    <form wire:submit="goToNextStep" class="px-8 pt-6 pb-8 mb-4">
         <h2 class="text-2xl font-bold mb-2">Personal Information</h2>
         <p class="text-gray-600 mb-6">Step 3 of 4: Tell us a bit about yourself</p>
 
@@ -49,13 +49,13 @@
 
         <!-- Navigation buttons -->
         <div class="flex justify-between items-center">
-            <x-secondary-button wire:click="goBack">
+            <x-secondary-button type="button" wire:click="goBack">
                 Back
             </x-secondary-button>
 
-            <x-primary-button wire:click="goToNextStep">
+            <x-primary-button>
                 Continue
             </x-primary-button>
         </div>
-    </div>
+    </form>
 </div>

@@ -18,20 +18,21 @@ class OrderNotConfirmedGuard implements GuardContract
      */
     public function passes(Request $request): bool
     {
-        $checkout_order = workflowState('checkout')
+        $orderNumber = workflowState('checkout')
             ->forRequest($request)
-            ->get('checkout.order');
+            ->get('checkout.order.order_number');
 
-        if (
-            empty($checkout_order['order_number'])
-            || ! $checkout_order['order_confirmed']
-        ) {
+        $orderConfirmed = workflowState('checkout')
+            ->forRequest($request)
+            ->get('checkout.order.order_confirmed', false);
+
+        if (empty($orderNumber) || ! $orderConfirmed) {
             return false;
         }
 
-        $order_exists = Order::where('order_number', $checkout_order['order_number'])->exists();
+        $order_exists = Order::where('order_number', $orderNumber)->exists();
 
-        return $order_exists && $checkout_order['order_confirmed'];
+        return $order_exists && $orderConfirmed;
     }
 
     /**

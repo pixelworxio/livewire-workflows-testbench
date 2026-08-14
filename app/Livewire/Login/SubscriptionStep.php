@@ -7,7 +7,7 @@ use Livewire\Component;
 use Pixelworxio\LivewireWorkflows\Attributes\WorkflowStep;
 use Pixelworxio\LivewireWorkflows\Livewire\Concerns\InteractsWithWorkflows;
 
-#[WorkflowStep(flow:'login', key: 'mfa', middleware: ['web', 'auth', 'verified'])]
+#[WorkflowStep(flow: 'login', key: 'subscription', middleware: ['web', 'auth', 'verified'])]
 class SubscriptionStep extends Component
 {
     use InteractsWithWorkflows;
@@ -20,8 +20,9 @@ class SubscriptionStep extends Component
         $user = auth()->user();
 
         // Ensure user has a business
-        if (!$user->business) {
+        if (! $user->business) {
             session()->flash('error', 'You must be associated with a business to create a subscription.');
+
             return;
         }
 
